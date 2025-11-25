@@ -498,7 +498,7 @@ def record(cfg: RecordConfig) -> LeRobotDataset:
             recorded_episodes += 1
 
             # back up the dataset, keeping 2 backups at a time
-            if recorded_episodes % 20 == 0: 
+            if dataset.num_episodes % 20 == 0: 
                 print("Creating backup of dataset...")
                 datasets_path = "~/.cache/huggingface/lerobot/"
                 backup_path = os.path.join(datasets_path, f"{cfg.dataset.repo_id}_backup_{current_backup}")
