@@ -59,7 +59,7 @@ lerobot-record \
 """
 
 import logging
-import time
+import time, os
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from pprint import pformat
@@ -445,6 +445,8 @@ def record(cfg: RecordConfig) -> LeRobotDataset:
 
     listener, events = init_keyboard_listener()
 
+    current_backup = 0
+    num_backups = 3
     with VideoEncodingManager(dataset):
         recorded_episodes = 0
         while recorded_episodes < cfg.dataset.num_episodes and not events["stop_recording"]:
@@ -494,6 +496,23 @@ def record(cfg: RecordConfig) -> LeRobotDataset:
 
             dataset.save_episode()
             recorded_episodes += 1
+
+            # back up the dataset, keeping 2 backups at a time
+            if recorded_episodes % 20 == 0: 
+                print("Creating backup of dataset...")
+                datasets_path = "~/.cache/huggingface/lerobot/"
+                backup_path = os.path.join(datasets_path, f"{cfg.dataset.repo_id}_backup_{current_backup}")
+
+                if os.path.isdir(backup_path):
+                    os.system(f"rm -rf {backup_path}")
+
+                cmd = f"cp {os.path.join(datasets_path, cfg.dataset.repo_id)} {backup_path}"
+                os.system(cmd)
+
+                if current_backup == num_backups - 1:
+                    current_backup = 0
+                else:
+                    current_backup += 1
 
     log_say("Stop recording", cfg.play_sounds, blocking=True)
 
