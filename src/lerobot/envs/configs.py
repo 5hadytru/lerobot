@@ -910,6 +910,10 @@ class SO101BenchEnvConfig(EnvConfig):
         from lerobot.sim.integrations.so101_bench import parse_cameras
 
         parse_cameras(self.cameras)
+        if self.max_parallel_tasks != 1:
+            raise ValueError(
+                "SO-101 Bench runs its tasks one at a time in a single simulator; use --env.max_parallel_tasks=1."
+            )
 
     def sim_settings(self) -> dict[str, Any]:
         return {

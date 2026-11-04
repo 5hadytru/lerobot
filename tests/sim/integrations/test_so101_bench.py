@@ -111,6 +111,11 @@ def test_rejects_unknown_camera():
         SO101BenchEnvConfig(cameras="front")
 
 
+def test_rejects_parallel_tasks():
+    with pytest.raises(ValueError, match="max_parallel_tasks=1"):
+        SO101BenchEnvConfig(max_parallel_tasks=2)
+
+
 def test_rejects_batches(fake_checkout):
     with pytest.raises(ValueError, match="batch_size=1"):
         _config(fake_checkout).create_envs(n_envs=2)
